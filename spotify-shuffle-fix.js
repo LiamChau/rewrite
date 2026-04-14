@@ -1,8 +1,6 @@
 /**
  * Spotify shuffle fix for Quantumult X
  * Enhanced request-header cleaner
- * Best used with Amlabort spot-proto-eevee.js
- */
 
 let headers = $request.headers || {};
 
