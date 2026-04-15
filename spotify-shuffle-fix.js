@@ -1,21 +1,39 @@
 /**
  * Spotify shuffle fix for Quantumult X
  * Enhanced request-header cleaner
+ */
 
-let headers = $request.headers || {};
+try {
+  let headers = {};
 
-// 清理所有常见缓存头
-delete headers["If-None-Match"];
-delete headers["if-none-match"];
-delete headers["ETag"];
-delete headers["etag"];
-delete headers["Cache-Control"];
-delete headers["cache-control"];
-delete headers["If-Modified-Since"];
-delete headers["if-modified-since"];
+  if ($request && $request.headers && typeof $request.headers === "object") {
+    headers = $request.headers;
+  } else {
+    $done({});
+  }
 
-// 某些版本会缓存 customize 配置
-headers["Cache-Control"] = "no-cache";
-headers["Pragma"] = "no-cache";
+  // 删除常见缓存头
+  [
+    "If-None-Match",
+    "if-none-match",
+    "ETag",
+    "etag",
+    "Cache-Control",
+    "cache-control",
+    "If-Modified-Since",
+    "if-modified-since",
+    "Pragma",
+    "pragma"
+  ].forEach(k => {
+    try { delete headers[k]; } catch (e) {}
+  });
 
-$done({ headers });
+  // 强制 no-cache
+  headers["Cache-Control"] = "no-cache";
+  headers["Pragma"] = "no-cache";
+
+  $done({ headers });
+} catch (e) {
+  $done({});
+}
+
