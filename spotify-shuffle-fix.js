@@ -4,11 +4,7 @@
  */
 
 try {
-  if (
-    !$request ||
-    !$request.headers ||
-    typeof $request.headers !== "object"
-  ) {
+  if (!$request || !$request.headers) {
     $done({});
     return;
   }
@@ -29,9 +25,9 @@ try {
   ];
 
   for (const key of removeKeys) {
-    if (key in headers) {
+    try {
       delete headers[key];
-    }
+    } catch (e) {}
   }
 
   headers["Cache-Control"] = "no-cache";
