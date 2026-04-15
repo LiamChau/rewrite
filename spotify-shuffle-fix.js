@@ -4,16 +4,18 @@
  */
 
 try {
-  let headers = {};
-
-  if ($request && $request.headers && typeof $request.headers === "object") {
-    headers = $request.headers;
-  } else {
+  if (
+    !$request ||
+    !$request.headers ||
+    typeof $request.headers !== "object"
+  ) {
     $done({});
+    return;
   }
 
-  // 删除常见缓存头
-  [
+  let headers = $request.headers;
+
+  const removeKeys = [
     "If-None-Match",
     "if-none-match",
     "ETag",
@@ -24,11 +26,14 @@ try {
     "if-modified-since",
     "Pragma",
     "pragma"
-  ].forEach(k => {
-    try { delete headers[k]; } catch (e) {}
-  });
+  ];
 
-  // 强制 no-cache
+  for (const key of removeKeys) {
+    if (key in headers) {
+      delete headers[key];
+    }
+  }
+
   headers["Cache-Control"] = "no-cache";
   headers["Pragma"] = "no-cache";
 
