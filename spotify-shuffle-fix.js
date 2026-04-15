@@ -1,31 +1,30 @@
 /**
  * Spotify shuffle fix for Quantumult X
- * [rewrite_local]
- * ^https?://(api|spclient)\.spotify\.com/ url request-header spotify-shuffle-fix.js
  */
 
 try {
-  if (!$request || !$request.headers || typeof $request.headers !== "object") {
+  let headers = {};
+
+  if ($request && $request.headers && typeof $request.headers === "object") {
+    headers = $request.headers;
+  } else {
     $done({});
-    return;
   }
 
-  const method = ($request.method || "").toUpperCase();
-  if (method !== "GET" && method !== "HEAD") {
-    $done({});
-    return;
-  }
-
-  let headers = $request.headers;
-
-  const removeKeys = [
-    "If-None-Match", "if-none-match",
-    "If-Modified-Since", "if-modified-since",
-  ];
-
-  for (const key of removeKeys) {
-    if (key in headers) delete headers[key];
-  }
+  [
+    "If-None-Match",
+    "if-none-match",
+    "ETag",
+    "etag",
+    "Cache-Control",
+    "cache-control",
+    "If-Modified-Since",
+    "if-modified-since",
+    "Pragma",
+    "pragma"
+  ].forEach(k => {
+    try { delete headers[k]; } catch (e) {}
+  });
 
   headers["Cache-Control"] = "no-cache";
   headers["Pragma"] = "no-cache";
